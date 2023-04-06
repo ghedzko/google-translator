@@ -17,15 +17,22 @@ function App() {
     if (fromText === '') {
       return;
     }
-    translate(fromLanguage, toLanguage, fromText)
-      .then((text) => {
-        if (text == null) return
-        setResult(text)
 
-      }
-      )
-      .catch(() => { setResult('error') });
-  }, [fromLanguage, toLanguage, fromText, setResult]);
+    const timer = setTimeout(() => {
+      translate(fromLanguage, toLanguage, fromText)
+        .then((text) => {
+          console.log(text);
+          if (text == null) return;
+          setResult(text);
+        })
+        .catch(() => {
+          setResult('error');
+        });
+    }, 1000); // Retraso de 1 segundo
+
+    // Limpieza al desmontar el componente o cuando las dependencias cambien
+    return () => { clearTimeout(timer) };
+  }, [fromLanguage, toLanguage, fromText]);
   return (
     <Container fluid >
       <h1>Google translate</h1>
