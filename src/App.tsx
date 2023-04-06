@@ -1,16 +1,31 @@
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { useStore } from './hooks/useStore';
-import { Row, Container, Col, Button, Form, Stack } from 'react-bootstrap';
+import { Row, Container, Col, Button, Stack } from 'react-bootstrap';
 import { AUTO_LANGUAGE } from './constants';
 import { ArrowsIcon } from './components/Icons';
 import { LanguageSelector } from './components/LanguageSelector';
 import { SectionType } from './types/types.d';
 import { TextArea } from './components/TextArea';
+import { useEffect } from 'react';
+import { translate } from './services/translate';
 
 function App() {
-  const { fromLanguage, toLanguage, fromText, loading, result, interchangeLanguages, setFromLanguage, setToLanguage } = useStore()
-  console.log({ fromLanguage, toLanguage, fromText, loading, result, setFromLanguage, setToLanguage })
+  const { fromLanguage, toLanguage, fromText, loading, result, interchangeLanguages, setFromLanguage, setToLanguage, setFromText, setResult } = useStore()
+  // console.log({ fromLanguage, toLanguage, fromText, loading, result, setFromLanguage, setToLanguage, })
+  useEffect(() => {
+    if (fromText === '') {
+      return;
+    }
+    translate(fromLanguage, toLanguage, fromText)
+      .then((text) => {
+        if (text == null) return
+        setResult(text)
+
+      }
+      )
+      .catch(() => { setResult('error') });
+  }, [fromLanguage, toLanguage, fromText, setResult]);
   return (
     <Container fluid >
       <h1>Google translate</h1>
@@ -22,7 +37,7 @@ function App() {
             <TextArea
               type={SectionType.From}
               value={fromText}
-              onChange={setFromLanguage}
+              onChange={setFromText}
             />
           </Stack>
         </Col>
@@ -41,7 +56,7 @@ function App() {
               type={SectionType.To}
               value={result}
               loading={loading}
-              onChange={setToLanguage}
+              onChange={setResult}
             />
           </Stack>
         </Col>
